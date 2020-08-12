@@ -80,7 +80,7 @@ async function verify(token) {
 
 app.post('/google', async(req, res) => {
 
-    let token = req.body.idToken;
+    let token = req.body.idtoken;
 
     let googleUser = await verify(token)
         .catch(e => {
@@ -90,6 +90,7 @@ app.post('/google', async(req, res) => {
             });
         });
 
+
     Usuario.findOne({ email: googleUser.email }, (err, usuarioDB) => {
 
         if (err) {
@@ -97,14 +98,15 @@ app.post('/google', async(req, res) => {
                 ok: false,
                 err
             });
-        }
+        };
 
         if (usuarioDB) {
+
             if (usuarioDB.google === false) {
                 return res.status(400).json({
                     ok: false,
                     err: {
-                        message: 'Debe de usar su autenticacion normal'
+                        message: 'Debe de usar su autenticación normal'
                     }
                 });
             } else {
@@ -112,14 +114,17 @@ app.post('/google', async(req, res) => {
                     usuario: usuarioDB
                 }, process.env.SEED, { expiresIn: process.env.CADUCIDAD_TOKEN });
 
+
                 return res.json({
                     ok: true,
                     usuario: usuarioDB,
-                    token
-                })
+                    token,
+                });
+
             }
+
         } else {
-            // si usuario no existe en la base de datos
+            // Si el usuario no existe en nuestra base de datos
             let usuario = new Usuario();
 
             usuario.nombre = googleUser.nombre;
@@ -150,9 +155,12 @@ app.post('/google', async(req, res) => {
 
 
             });
+
         }
 
+
     });
+
 
 });
 
